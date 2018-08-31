@@ -19,17 +19,20 @@ extern crate isosurface;
 
 mod common;
 
+use cgmath::{vec3, Matrix4, Point3, SquareMatrix};
+use common::reinterpret_cast_slice;
+use common::sources::Torus;
 use glium::glutin;
+use glium::glutin::{
+    Api, ControlFlow, ElementState, Event, GlProfile, GlRequest, KeyboardInput, VirtualKeyCode,
+    WindowEvent,
+};
+use glium::texture::{
+    DepthFormat, DepthTexture2d, MipmapsOption, Texture2d, UncompressedFloatFormat,
+};
 use glium::Surface;
-use glium::texture::{DepthFormat, DepthTexture2d, MipmapsOption, Texture2d,
-                     UncompressedFloatFormat};
-use glium::glutin::{Api, ControlFlow, ElementState, Event, GlProfile, GlRequest, KeyboardInput,
-                    VirtualKeyCode, WindowEvent};
-use cgmath::{Matrix4, Point3, SquareMatrix, vec3};
 use isosurface::point_cloud::PointCloud;
 use isosurface::source::CentralDifference;
-use common::sources::Torus;
-use common::reinterpret_cast_slice;
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -65,7 +68,7 @@ fn main() {
     let display =
         glium::Display::new(window, context, &events_loop).expect("failed to create display");
 
-    let (width, height) = display.gl_window().get_inner_size_pixels().unwrap();
+    let (width, height) = display.gl_window().get_inner_size().unwrap();
 
     let subdivisions = 64;
 
@@ -295,8 +298,8 @@ fn main() {
         ).unwrap();
 
         events_loop.run_forever(|event| {
-            match event {
-                Event::WindowEvent { event, .. } => match event {
+            if let Event::WindowEvent { event, .. } = event {
+                match event {
                     WindowEvent::Closed => return ControlFlow::Break,
                     WindowEvent::KeyboardInput {
                         input:
@@ -306,13 +309,11 @@ fn main() {
                                 ..
                             },
                         ..
-                    } => match virtual_keycode {
-                        Some(VirtualKeyCode::Escape) => return ControlFlow::Break,
-                        _ => (),
+                    } => if let Some(VirtualKeyCode::Escape) = virtual_keycode {
+                        return ControlFlow::Break
                     },
                     _ => (),
-                },
-                _ => (),
+                }
             }
 
             // First pass, render depth-tested points into the first buffer

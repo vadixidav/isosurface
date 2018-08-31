@@ -20,20 +20,22 @@ extern crate isosurface;
 
 mod common;
 
-use glium::glutin;
-use glium::Surface;
-use glium::backend::Facade;
-use glium::index::PrimitiveType;
-use glium::draw_parameters::PolygonMode;
-use glium::glutin::{Api, ControlFlow, ElementState, Event, GlProfile, GlRequest, KeyboardInput,
-                    VirtualKeyCode, WindowEvent};
-use cgmath::{Matrix4, Point3, vec3};
-use isosurface::marching_cubes::MarchingCubes;
-use isosurface::linear_hashed_marching_cubes::LinearHashedMarchingCubes;
-use isosurface::source::CentralDifference;
-use common::sources::{CubeSphere, Torus};
+use cgmath::{vec3, Matrix4, Point3};
 use common::reinterpret_cast_slice;
+use common::sources::{CubeSphere, Torus};
 use common::text::layout_text;
+use glium::backend::Facade;
+use glium::draw_parameters::PolygonMode;
+use glium::glutin;
+use glium::glutin::{
+    Api, ControlFlow, ElementState, Event, GlProfile, GlRequest, KeyboardInput, VirtualKeyCode,
+    WindowEvent,
+};
+use glium::index::PrimitiveType;
+use glium::Surface;
+use isosurface::linear_hashed_marching_cubes::LinearHashedMarchingCubes;
+use isosurface::marching_cubes::MarchingCubes;
+use isosurface::source::CentralDifference;
 
 #[derive(Copy, Clone)]
 #[repr(C)]
@@ -44,7 +46,7 @@ struct Vertex {
 
 implement_vertex!(Vertex, position, normal);
 
-const HELP_TEXT: &'static str =
+const HELP_TEXT: &str =
     "Press [A] to switch Algorithm, [S] to switch Shape, or [W] to toggle Wireframe";
 
 struct GenerateResult(glium::VertexBuffer<Vertex>, glium::IndexBuffer<u32>, String);
@@ -176,8 +178,8 @@ fn main() {
     let label_transform = layout_text(50.0, aspect, 1.0, 50.0 / aspect - 2.0);
 
     events_loop.run_forever(|event| {
-        match event {
-            Event::WindowEvent { event, .. } => match event {
+        if let Event::WindowEvent { event, .. } = event {
+            match event {
                 WindowEvent::Closed => return ControlFlow::Break,
                 WindowEvent::KeyboardInput {
                     input:
@@ -203,8 +205,7 @@ fn main() {
                     _ => (),
                 },
                 _ => (),
-            },
-            _ => (),
+            }
         }
 
         let mut surface = display.draw();
@@ -239,8 +240,7 @@ fn main() {
                 &program,
                 &uniforms,
                 &draw_parameters,
-            )
-            .expect("failed to draw to surface");
+            ).expect("failed to draw to surface");
 
         text.set_text(&generated.2);
         glium_text::draw(

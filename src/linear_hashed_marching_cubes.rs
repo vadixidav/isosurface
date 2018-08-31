@@ -13,10 +13,10 @@
 // limitations under the License.
 
 use linear_hashed_octree::LinearHashedOctree;
-use morton::Morton;
 use marching_cubes_impl::{get_offset, interpolate, march_cube};
 use marching_cubes_tables::EDGE_CONNECTION;
 use math::Vec3;
+use morton::Morton;
 use source::{HermiteSource, Source};
 use std::collections::HashMap;
 
@@ -24,7 +24,7 @@ use std::collections::HashMap;
 const REMAP_CUBE: [usize; 8] = [2, 3, 1, 0, 6, 7, 5, 4];
 
 // Used to compute the diagonal dimension (i.e. 3-dimensional hypotenuse) of a cube.
-const SQRT_OF_3: f32 = 1.732_050_807_57;
+const SQRT_OF_3: f32 = 1.732_050_8;
 
 // Uniquely identifies an edge by its terminal vertices
 #[derive(Debug, Hash, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
@@ -186,7 +186,7 @@ impl LinearHashedMarchingCubes {
             for i in 0..8 {
                 let mut m = key.dual_vertex(level, i);
                 while m > Morton::new() {
-                    if let Some(&distance) = octree.get_node(&m) {
+                    if let Some(&distance) = octree.get_node(m) {
                         duals[i] = m;
                         dual_distances[i] = distance;
                         break;

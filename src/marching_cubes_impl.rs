@@ -27,8 +27,8 @@ where
     E: FnMut(usize) -> (),
 {
     let mut cube_index = 0;
-    for i in 0..8 {
-        if values[i] <= 0.0 {
+    for (i, &value) in values.iter().enumerate() {
+        if value <= 0.0 {
             cube_index |= 1 << i;
         }
     }

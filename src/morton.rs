@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std;
 use math::Vec3;
+use std;
 
 const THREE_2: usize = 9;
 const THREE_1: usize = 3;
@@ -52,7 +52,7 @@ impl Morton {
     }
 
     /// The depth of this octree node
-    pub fn level(&self) -> usize {
+    pub fn level(self) -> usize {
         match self.0 {
             0 => 0,
             a => ((a as f64).ln() * LG2_3).floor() as usize,
@@ -60,22 +60,22 @@ impl Morton {
     }
 
     /// The parent node to this octree node.
-    pub fn parent(&self) -> Self {
+    pub fn parent(self) -> Self {
         Morton((self.0 >> 3).max(1))
     }
 
     /// Get one of the 8 child nodes of this octree node.
-    pub fn child(&self, which: u8) -> Self {
+    pub fn child(self, which: u8) -> Self {
         Morton((self.0 << 3) | u64::from(which))
     }
 
     /// The distance from the center of the octree node to the edge (i.e. half the width/height/depth).
-    pub fn size(&self) -> f32 {
+    pub fn size(self) -> f32 {
         1.0 / ((2 << self.level()) as f32)
     }
 
     /// Get the center of this octree node as a vector.
-    pub fn center(&self) -> Vec3 {
+    pub fn center(self) -> Vec3 {
         let mut bz = (self.0 >> 2) & DILATE_MASK_0;
         let mut by = (self.0 >> 1) & DILATE_MASK_0;
         let mut bx = self.0 & DILATE_MASK_0;
@@ -116,14 +116,16 @@ impl Morton {
     }
 
     /// Assuming that self is a point on the dual mesh, finds the 8 corresponding vertices on the primal mesh.
-    pub fn primal_vertex(&self, level: usize, which: usize) -> Morton {
+    pub fn primal_vertex(self, level: usize, which: usize) -> Morton {
         let k = 1 << (3 * level);
         let k_plus_one = k << 1;
 
-        let vk = *self + Morton(which as u64);
+        let vk = self + Morton(which as u64);
         let dk = (vk - Morton(k)).0;
 
-        if vk.0 >= k_plus_one || (dk & DILATE_TX) == 0 || (dk & DILATE_TY) == 0
+        if vk.0 >= k_plus_one
+            || (dk & DILATE_TX) == 0
+            || (dk & DILATE_TY) == 0
             || (dk & DILATE_TZ) == 0
         {
             Morton(0)
@@ -133,7 +135,7 @@ impl Morton {
     }
 
     /// Assuming that self is a point on the primal mesh, finds the 8 corresponding vertices on the dual mesh.
-    pub fn dual_vertex(&self, level: usize, which: usize) -> Morton {
+    pub fn dual_vertex(self, level: usize, which: usize) -> Morton {
         let dk = Morton(self.0 >> (3 * (MAX_LEVEL - level)));
 
         dk - Morton(which as u64)

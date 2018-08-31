@@ -61,7 +61,7 @@ impl<Node> LinearHashedOctree<Node> {
     }
 
     #[inline]
-    pub fn get_node(&self, key: &Morton) -> Option<&Node> {
-        self.nodes.get(key)
+    pub fn get_node(&self, key: Morton) -> Option<&Node> {
+        self.nodes.get(&key)
     }
 }
